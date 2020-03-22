@@ -2,6 +2,7 @@ import progress,notify
 import os,terminal,strformat,strutils
 
 const 
+  modes = ['w','s','l','c']
   modeTime = [25,5,15] # workTime, short breaktime , long breaktime 
   modeText = ["time to work", "take a short break", "take a long break", "unnamed custom Interval"]
   modeDesc = ["work", "short break", "long break", "custom"]
@@ -64,14 +65,12 @@ template getText(): string =
   
 
 proc parseInput(plan: string): seq[Interval] =
-  const modes = ['w','s','l','c']
   var 
     parsingTime = false
     parsingText = false
     currentMode: 0..3
     timeStr = ""
     text = ""
-    i = 0
   for i,c in plan:
     # parse custom time for a mode
     if parsingTime:
