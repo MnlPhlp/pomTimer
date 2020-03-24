@@ -1,4 +1,4 @@
-import progress,notify
+import progress
 import os,terminal,strformat,strutils,parseopt,times
 
 const 
@@ -7,6 +7,7 @@ const
   modeText = ["time to work", "take a short break", "take a long break", "unnamed custom Interval"]
   modeDesc = ["work", "short break", "long break", "custom"]
   help = staticRead("help.txt")
+  useNotifications = not defined(windows)
 
 proc showRemTime(time: int) =
   let min = (int) (time / 60)
@@ -32,11 +33,12 @@ proc runPart(minutes: int) =
   bar.finish()
   stdout.flushFile()
 
-
-proc notify(text: string) =
-  var n: Notification = newNotification("pomTimer", text, "dialog-information")
-  n.timeout = 10000
-  discard n.show()
+when useNotifications:
+  import notify
+  proc notify(text: string) =
+    var n: Notification = newNotification("pomTimer", text, "dialog-information")
+    n.timeout = 10000
+    discard n.show()
 
 type Interval = tuple[mode: 0..3,text: string,time: int]
 
@@ -57,8 +59,10 @@ proc showTime(intervals: seq[Interval],iterations: int) =
   let wHour = (int)(workTime/60)
   let wHourText = if hour>0: &"{wHour}h:" else: ""
   echo &"working time: {wHourText}{wMin}min"
-  let finishTime = now() + initTimeInterval(minutes = completeTime)
-  echo "finished at:  " & finishTime.format("HH:MM")
+  let now = now()
+  let time = hour.hours + min.minutes
+  let finishTime = now + time
+  echo "finished at:  " & finishTime.format("HH:mm")
 
 
 proc showInfo(intervals: seq[Interval],iterations: int) =
@@ -123,6 +127,10 @@ proc parsePlan(plan: string): seq[Interval] =
           result.add((currentMode,"",modeTime[currentMode]))
       else:
         quit("Error: invalid mode " & c)
+  #check if parsing finished successfully
+  if parsingTime:
+    let time = timeStr.parseInt()
+    result.add((currentMode,"",time))
   if parsingText:
     quit("Error: missing ':' to end custom task")
   
@@ -178,7 +186,8 @@ proc main() =
         let time = interval.time
         let text = if interval.text == "": modeText[interval.mode] else: interval.text
         echo text
-        notify(text)
+        when useNotifications:
+          notify(text)
         runPart(time)
       echo ""
 
