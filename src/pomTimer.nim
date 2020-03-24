@@ -103,8 +103,9 @@ proc parseInput(plan: string): seq[Interval] =
 
 
 var plan = "" 
-if paramCount() == 1:
-  plan = paramStr(1)
+if paramCount() >= 1:
+  for i in 1..paramCount():
+    plan &= paramStr(i)
 else:
   plan = "wswswswlwswswswl"
 

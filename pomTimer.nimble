@@ -5,6 +5,7 @@ author        = "MnlPhlp"
 description   = "A simple pomodoro timer for the comandline with cli-output and notifications."
 license       = "MIT"
 srcDir        = "src"
+binDir        = "bin"
 bin           = @["pomTimer"]
 
 
