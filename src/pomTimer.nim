@@ -46,7 +46,7 @@ proc showInfo(intervals: seq[Interval]) =
     let time = interval.time
     let text = interval.text
     let mode = modeDesc[interval.mode]
-    echo "mode: ",mode,"   time: ",time,"   text: ",text
+    echo &"mode: {mode:11}  time: {time:2}  text: {text}"
     completeTime += time
   echo "\ncomplete time: ",completeTime," minutes\n"
 
@@ -100,12 +100,17 @@ proc parseInput(plan: string): seq[Interval] =
           result.add((currentMode,"",modeTime[currentMode]))
       else:
         quit("Error: invalid mode " & c)
-
+  
 
 var plan = "" 
 if paramCount() >= 1:
-  for i in 1..paramCount():
-    plan &= paramStr(i)
+  if fileExists(paramStr(1)):
+    plan = readFile(paramStr(1))
+    for c in Whitespace:
+      plan = plan.replace(&"{c}","")
+  else:
+    for i in 1..paramCount():
+      plan &= paramStr(i)
 else:
   plan = "wswswswlwswswswl"
 
