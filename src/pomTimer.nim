@@ -1,5 +1,5 @@
 import progress,notify
-import os,terminal,strformat,strutils,parseopt
+import os,terminal,strformat,strutils,parseopt,times
 
 const 
   modes = ['w','s','l','c']
@@ -42,10 +42,23 @@ type Interval = tuple[mode: 0..3,text: string,time: int]
 
 proc showTime(intervals: seq[Interval],iterations: int) =
   var completeTime = 0
+  var workTime = 0
   for interval in intervals:
     completeTime += interval.time
+    if interval.mode == 0:
+      workTime += interval.time
   completeTime *= iterations
-  echo "\ncomplete time: ",completeTime," minutes\n"
+  workTime *= iterations
+  let min = completeTime mod 60
+  let hour = (int)(completeTime/60)
+  let hourText = if hour>0: &"{hour}h:" else: ""
+  echo &"\ntotal time:   {hourText}{min}min"
+  let wMin = workTime mod 60
+  let wHour = (int)(workTime/60)
+  let wHourText = if hour>0: &"{wHour}h:" else: ""
+  echo &"working time: {wHourText}{wMin}min"
+  let finishTime = now() + initTimeInterval(minutes = completeTime)
+  echo "finished at:  " & finishTime.format("HH:MM")
 
 
 proc showInfo(intervals: seq[Interval],iterations: int) =
