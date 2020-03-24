@@ -159,7 +159,7 @@ proc main() =
           else:
             quit("Error: invalid option " & opt.key)
   else:
-    plan = "wswswswlwswswswl"
+    plan = "wswswswlwswswsw"
 
   if plan == "": quit(0)
   let intervals = parsePlan(plan)
