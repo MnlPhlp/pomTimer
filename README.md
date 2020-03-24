@@ -1,6 +1,26 @@
 # pomTimer
 This is a cli pomodoro timer with custom intervals and times. It shows a progress bar and notifications.
 
+## example
+```
+pomTimer wsw c45lunch_break:
+
+your plan:
+
+  mode: work         time: 25
+  mode: short break  time:  5
+  mode: work         time: 25
+  mode: custom       time: 45  text: lunch break
+
+  iterations: 1
+
+total time:   1h:40min
+working time: 0h:50min
+finished at:  00:34
+time to work
+[>..........................................................................................] 0.20%  24:58 remaining
+```
+
 ## Usage
 ```
 Usage: pomTimer [PLAN] [OPTIONS]
