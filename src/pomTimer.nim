@@ -94,12 +94,12 @@ proc parsePlan(plan: string): seq[Interval] =
         timeStr &= c
       else:
         parsingTime = false
-        if currentMode != 3:
+        if currentMode == 3:
+          parsingText = true
+        else:
           let time = timeStr.parseInt()
           result.add((currentMode,"",time))
           timeStr = ""
-        else:
-          parsingText = true
     # parse custom text for a custom interval
     if parsingText:
       if c == ':':
@@ -123,6 +123,8 @@ proc parsePlan(plan: string): seq[Interval] =
           result.add((currentMode,"",modeTime[currentMode]))
       else:
         quit("Error: invalid mode " & c)
+  if parsingText:
+    quit("Error: missing ':' to end custom task")
   
 proc main() = 
   var plan = "" 
