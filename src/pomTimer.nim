@@ -157,12 +157,14 @@ proc main() =
   else:
     showInfo(intervals,iterations)
     for i in 1..iterations:
-      echo &"iteration {i} of {iterations}"
+      if iterations > 1:
+        echo &"iteration {i} of {iterations}"
       for interval in intervals:
         let time = interval.time
         let text = if interval.text == "": modeText[interval.mode] else: interval.text
         echo text
         notify(text)
         runPart(time)
+      echo ""
 
 main()
