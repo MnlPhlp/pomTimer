@@ -1,11 +1,12 @@
 import progress,notify
-import os,terminal,strformat,strutils
+import os,terminal,strformat,strutils,parseopt
 
 const 
   modes = ['w','s','l','c']
   modeTime = [25,5,15] # workTime, short breaktime , long breaktime 
   modeText = ["time to work", "take a short break", "take a long break", "unnamed custom Interval"]
   modeDesc = ["work", "short break", "long break", "custom"]
+  help = staticRead("help.txt")
 
 proc showRemTime(time: int) =
   let min = (int) (time / 60)
@@ -39,16 +40,24 @@ proc notify(text: string) =
 
 type Interval = tuple[mode: 0..3,text: string,time: int]
 
-proc showInfo(intervals: seq[Interval]) =
+proc showTime(intervals: seq[Interval],iterations: int) =
   var completeTime = 0
-  echo "your plan:"
+  for interval in intervals:
+    completeTime += interval.time
+  completeTime *= iterations
+  echo "\ncomplete time: ",completeTime," minutes\n"
+
+
+proc showInfo(intervals: seq[Interval],iterations: int) =
+  echo "\nyour plan:\n"
   for interval in intervals:
     let time = interval.time
-    let text = interval.text
+    let text = if interval.text == "": "" else: &"text: {interval.text}"
     let mode = modeDesc[interval.mode]
-    echo &"mode: {mode:11}  time: {time:2}  text: {text}"
-    completeTime += time
-  echo "\ncomplete time: ",completeTime," minutes\n"
+    echo &"  mode: {mode:11}  time: {time:2}  {text}"
+  echo "\n  iterations: ",iterations
+  showTime(intervals,iterations)
+
 
 
 template nextChar(): char =
@@ -58,7 +67,7 @@ template nextChar(): char =
     '_'
   
 
-proc parseInput(plan: string): seq[Interval] =
+proc parsePlan(plan: string): seq[Interval] =
   var 
     parsingTime = false
     parsingText = false
@@ -83,6 +92,7 @@ proc parseInput(plan: string): seq[Interval] =
       if c == ':':
         parsingText = false
         let time = timeStr.parseInt()
+        text = text.replace('_',' ')
         result.add((currentMode,text,time))
         text = ""
         continue
@@ -101,28 +111,58 @@ proc parseInput(plan: string): seq[Interval] =
       else:
         quit("Error: invalid mode " & c)
   
-
-var plan = "" 
-if paramCount() >= 1:
-  if fileExists(paramStr(1)):
-    plan = readFile(paramStr(1))
-    for c in Whitespace:
-      plan = plan.replace(&"{c}","")
+proc main() = 
+  var plan = "" 
+  var iterations = 1
+  var showPlan = false
+  var showTime = false
+  if paramCount() >= 1:
+    for opt in getopt():
+      if opt.kind == cmdArgument:
+        if fileExists(opt.key):
+          # read tasks from the file
+          var tmp = readFile(paramStr(1))
+          for c in Whitespace:
+            tmp = tmp.replace(&"{c}","")
+          plan &= tmp
+        else:
+          # read tasks from the comandline
+          plan &= opt.key
+      else:
+        # parse Options
+        case opt.key:
+          of "h","help":
+            echo help
+            quit(0)
+          of "p","plan":
+            showPlan = true
+          of "t","time":
+            showTime = true
+          of "r","repeat":
+            try:
+              iterations = opt.val.parseInt()
+            except ValueError:
+              quit("Error: invalid value " & opt.val & " for option " & opt.key)
+          else:
+            quit("Error: invalid option " & opt.key)
   else:
-    for i in 1..paramCount():
-      plan &= paramStr(i)
-else:
-  plan = "wswswswlwswswswl"
+    plan = "wswswswlwswswswl"
 
-let intervals = parseInput(plan)
+  if plan == "": quit(0)
+  let intervals = parsePlan(plan)
+  if showPlan:
+    showInfo(intervals,iterations)  
+  elif showTime:
+    showTime(intervals,iterations)
+  else:
+    showInfo(intervals,iterations)
+    for i in 1..iterations:
+      echo &"iteration {i} of {iterations}"
+      for interval in intervals:
+        let time = interval.time
+        let text = if interval.text == "": modeText[interval.mode] else: interval.text
+        echo text
+        notify(text)
+        runPart(time)
 
-showInfo(intervals)
-
-for interval in intervals:
-  let time = interval.time
-  let text = if interval.text == "": modeText[interval.mode] else: interval.text
-  echo text
-  notify(text)
-  runPart(time)
-
-
+main()
