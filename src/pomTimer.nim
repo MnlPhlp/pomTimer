@@ -50,18 +50,12 @@ proc showInfo(intervals: seq[Interval]) =
     completeTime += time
   echo "\ncomplete time: ",completeTime," minutes\n"
 
+
 template nextChar(): char =
   if plan.len >= i+2:
     plan[i+1]
   else:
     '_'
-
-template getText(): string =
-  let index = plan.find(':',start=i)
-  if index == -1:
-    quit("Error: custom intervals need to end with ':'")
-  else:
-    plan[i..index-1]
   
 
 proc parseInput(plan: string): seq[Interval] =
