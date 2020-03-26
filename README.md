@@ -21,6 +21,9 @@ time to work
 [>................................................................................] 0.20%  24:58 remaining
 ```
 
+## Installation
+- nimble `nimble install pomTimer`
+
 ## Usage
 ```
 Usage: pomTimer [PLAN] [OPTIONS]
