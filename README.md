@@ -1,4 +1,4 @@
-# pomTimer
+# pomTimer ![CI](https://github.com/MnlPhlp/pomTimer/workflows/CI/badge.svg?branch=master)
 This is a cli pomodoro timer with custom intervals and times. It shows a progress bar and notifications.
 
 ## example
