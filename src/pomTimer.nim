@@ -25,10 +25,10 @@ proc runPart(minutes: int) =
   showRemTime(remTime)
   
   for i in 1..seconds:
-    bar.increment()
-    showRemTime(remTime)
     sleep(1000)
-    remTime -= 1
+    bar.increment()    
+    remTime -= 1    
+    showRemTime(remTime)
 
   bar.finish()
   stdout.flushFile()
