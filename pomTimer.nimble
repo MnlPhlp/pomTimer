@@ -1,6 +1,6 @@
 # Package
 
-version       = "1.0"
+version       = "1.1"
 author        = "MnlPhlp"
 description   = "A simple pomodoro timer for the comandline with cli-output and notifications."
 license       = "MIT"
